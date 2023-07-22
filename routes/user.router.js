@@ -35,6 +35,7 @@ userRouter.post("/register",async(req,res)=>{
 
 userRouter.post("/login",async(req,res)=>{
     const{email,password}=req.body;
+    console.log("backend",req.body)
     try {
         const user=await Usermodel.findOne({email});
         if(user){

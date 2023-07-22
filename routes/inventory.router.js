@@ -39,23 +39,30 @@ inventoryRouter.get("/allcars",async(req,res)=>{
     }
 })
 
-inventoryRouter.delete("/deletecar/:id",authenticator,authorizer(["dealer"]),async(req,res)=>{
-    const id=req.params.id;
-    try {
-        const car=await Inventorymodel.findOne({_id:id});
-        if(car.userID==req.body.userID){
-            await Inventorymodel.findByIdAndDelete({_id:id});
-            res.status(202).json({"msg":"car data deleted successfully"});
-        }else{
-            res.status(403).json({"msg":"You are not authorized to delete this particular car dara"});
-        }
+
+inventoryRouter.delete("/deletecar/:id",async(req,res)=>{
+    const {id}=req.params;
+    const userIdUserDoc = req.body.userId
+    console.log(userIdUserDoc, "46");
+     try {
+
+        const car=await Inventorymodel.findById({_id:id});
+    const {userID} = car
+
+    console.log(car.userID,"52");
+         if(userIdUserDoc==userID){
+             //  await Inventorymodel.findByIdAndDelete({_id:id});
+             console.log("car found");
+             res.status(202).json({"smg":"car  deleted successfully"});
+         }else{
+            console.log("not found");
+            res.status(200).json({"msg":"You are not authorized to delete this particular car dara"});
+         }
     } catch (error) {
         console.log(error.message);
         res.status(400).json({ "msg": "something went wrong while deleting car data" });
     }
 })
-
-
 
 module.exports = {
     inventoryRouter
