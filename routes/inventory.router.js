@@ -30,6 +30,9 @@ inventoryRouter.post("/addcar", authenticator, authorizer(["dealer"]), async (re
 
 
 inventoryRouter.get("/allcars",async(req,res)=>{
+//   const query = req.query
+
+
     try {
         const allcars=await Inventorymodel.find();
         res.status(200).json({"msg":"fetched all cars successfully","data":allcars});
@@ -38,20 +41,46 @@ inventoryRouter.get("/allcars",async(req,res)=>{
         res.status(400).json({ "msg": "something went wrong while getting all cars" })
     }
 })
+inventoryRouter.get("/cars/:color",async(req,res)=>{
+
+  const query = req.params.color
+console.log(query);
+    try {
+        const cars=await Inventorymodel.find({"color":{"$regex":query,"$options":"i"}});
+        console.log(cars);
+        res.status(200).json({"msg":"fetched all cars successfully","data":cars});
+    } catch (error) {
+        console.log(error.message);
+        res.status(400).json({ "msg": "something went wrong while getting all cars" })
+    }
+})
+
+inventoryRouter.get("/carsbrand/:brand",async(req,res)=>{
+
+  const query = req.params.brand
+console.log(query);
+    try {
+        const cars=await Inventorymodel.find({"Brand":{"$regex":query,"$options":"i"}});
+        // console.log(cars);
+        res.status(200).json({"msg":"fetched all cars successfully","data":cars});
+    } catch (error) {
+        console.log(error.message);
+        res.status(400).json({ "msg": "something went wrong while getting all cars" })
+    }
+})
 
 
-inventoryRouter.delete("/deletecar/:id",async(req,res)=>{
+inventoryRouter.delete("/deletecar/:id",authenticator,authorizer(["dealer"]),async(req,res)=>{
     const {id}=req.params;
-    const userIdUserDoc = req.body.userId
-    console.log(userIdUserDoc, "46");
-     try {
-
+    const userIdUserDoc = req.body.userID
+   
+    try {
         const car=await Inventorymodel.findById({_id:id});
     const {userID} = car
 
-    console.log(car.userID,"52");
+    
          if(userIdUserDoc==userID){
-             //  await Inventorymodel.findByIdAndDelete({_id:id});
+               await Inventorymodel.findByIdAndDelete({_id:id});
              console.log("car found");
              res.status(202).json({"smg":"car  deleted successfully"});
          }else{
@@ -63,6 +92,8 @@ inventoryRouter.delete("/deletecar/:id",async(req,res)=>{
         res.status(400).json({ "msg": "something went wrong while deleting car data" });
     }
 })
+
+
 
 module.exports = {
     inventoryRouter
